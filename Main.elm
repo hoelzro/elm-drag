@@ -25,7 +25,12 @@ init =
   } in (initialModel, Cmd.none)
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg model = (model, Cmd.none)
+update msg model =
+  let newModel = case msg of
+    MouseUp _        -> { model | isDown = False, wasDown = model.isDown }
+    MouseDown {x, y} -> { model | isDown = True, wasDown = model.isDown, currPosition = (x, y), prevPosition = (x, y) }
+    MouseMove {x, y} -> { model | currPosition = (x, y), prevPosition = model.currPosition }
+  in (newModel, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions _ = Sub.batch [
