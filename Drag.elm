@@ -21,8 +21,8 @@ initialModel = {
     currPosition = (0, 0)
   }
 
-subscriptions : Model -> (Msg -> msg) -> Sub msg
-subscriptions model constructor =
+subscriptions : (Msg -> msg) -> Model -> Sub msg
+subscriptions constructor model =
   let ups   = Mouse.ups <| constructor << MouseUp
       downs = Mouse.downs <| constructor << MouseDown
       moves = Mouse.moves <| constructor << MouseMove
@@ -36,8 +36,8 @@ dragCmd constructor (px, py) (cx, cy) =
       task = always <| constructor (dx, dy)
   in Task.perform task task Time.now
 
-update : Msg -> Model -> ((Int, Int) -> msg) -> (Model, Cmd msg)
-update msg model constructor =
+update : ((Int, Int) -> msg) -> Msg -> Model -> (Model, Cmd msg)
+update constructor msg model =
   case msg of
     MouseUp _        -> ({ model | isDown = False }, Cmd.none)
     MouseDown {x, y} -> ({ isDown = True, currPosition = (x, y) }, Cmd.none)
