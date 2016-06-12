@@ -41,4 +41,9 @@ update msg model constructor =
   case msg of
     MouseUp _        -> ({ model | isDown = False }, Cmd.none)
     MouseDown {x, y} -> ({ isDown = True, currPosition = (x, y) }, Cmd.none)
-    MouseMove {x, y} -> ({ model | currPosition = (x, y) }, if model.isDown then dragCmd constructor model.currPosition (x, y) else Cmd.none)
+    MouseMove {x, y} ->
+      let newModel = { model | currPosition = (x, y) }
+          cmd = if model.isDown
+            then dragCmd constructor model.currPosition (x, y)
+            else Cmd.none
+      in (newModel, cmd)
