@@ -7,9 +7,7 @@ import Mouse
 
 type alias Model = {
     isDown : Bool,
-    wasDown : Bool,
-    currPosition : (Int, Int),
-    prevPosition : (Int, Int)
+    currPosition : (Int, Int)
   }
 
 type Msg =
@@ -20,9 +18,7 @@ type Msg =
 initialModel : Model
 initialModel = {
     isDown = False,
-    wasDown = False,
-    currPosition = (0, 0),
-    prevPosition = (0, 0)
+    currPosition = (0, 0)
   }
 
 subscriptions : Model -> (Msg -> msg) -> Sub msg
@@ -43,6 +39,6 @@ dragCmd constructor (px, py) (cx, cy) =
 update : Msg -> Model -> ((Int, Int) -> msg) -> (Model, Cmd msg)
 update msg model constructor =
   case msg of
-    MouseUp _        -> ({ model | isDown = False, wasDown = model.isDown }, Cmd.none)
-    MouseDown {x, y} -> ({ isDown = True, wasDown = model.isDown, currPosition = (x, y), prevPosition = (x, y) }, Cmd.none)
-    MouseMove {x, y} -> ({ model | currPosition = (x, y), prevPosition = model.currPosition }, if model.isDown then dragCmd constructor model.currPosition (x, y) else Cmd.none)
+    MouseUp _        -> ({ model | isDown = False }, Cmd.none)
+    MouseDown {x, y} -> ({ isDown = True, currPosition = (x, y) }, Cmd.none)
+    MouseMove {x, y} -> ({ model | currPosition = (x, y) }, if model.isDown then dragCmd constructor model.currPosition (x, y) else Cmd.none)
