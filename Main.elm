@@ -2,18 +2,29 @@ import Html.App as App
 import Html exposing (Html, text)
 
 import Mouse
+import Task
+import Time
 
 type alias Model = {
     isDown : Bool,
     wasDown : Bool,
     currPosition : (Int, Int),
-    prevPosition : (Int, Int)
+    prevPosition : (Int, Int),
+    dragDistance : Int
   }
 
 type Msg =
   MouseUp   Mouse.Position |
   MouseDown Mouse.Position |
-  MouseMove Mouse.Position
+  MouseMove Mouse.Position |
+  Drag (Int, Int)
+
+dragCmd : ((Int, Int) -> msg) -> (Int, Int) -> (Int, Int) -> Cmd msg
+dragCmd constructor (px, py) (cx, cy) =
+  let dx = px - cx
+      dy = py - cy
+      task = always <| constructor (dx, dy)
+  in Task.perform task task Time.now
 
 init : (Model, Cmd Msg)
 init =
@@ -21,16 +32,17 @@ init =
     isDown = False,
     wasDown = False,
     currPosition = (0, 0),
-    prevPosition = (0, 0)
+    prevPosition = (0, 0),
+    dragDistance = 0
   } in (initialModel, Cmd.none)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-  let newModel = case msg of
-    MouseUp _        -> { model | isDown = False, wasDown = model.isDown }
-    MouseDown {x, y} -> { model | isDown = True, wasDown = model.isDown, currPosition = (x, y), prevPosition = (x, y) }
-    MouseMove {x, y} -> { model | currPosition = (x, y), prevPosition = model.currPosition }
-  in (newModel, Cmd.none)
+  case msg of
+    MouseUp _        -> ({ model | isDown = False, wasDown = model.isDown }, Cmd.none)
+    MouseDown {x, y} -> ({ model | isDown = True, wasDown = model.isDown, currPosition = (x, y), prevPosition = (x, y) }, Cmd.none)
+    MouseMove {x, y} -> ({ model | currPosition = (x, y), prevPosition = model.currPosition }, if model.isDown then dragCmd Drag model.currPosition (x, y) else Cmd.none)
+    Drag (dx, dy)    -> ({ model | dragDistance = model.dragDistance + (abs dx) + (abs dy) }, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions _ = Sub.batch [
