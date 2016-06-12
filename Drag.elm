@@ -23,11 +23,11 @@ initialModel = {
 
 subscriptions : Model -> (Msg -> msg) -> Sub msg
 subscriptions model constructor =
-  Sub.batch [
-      Mouse.ups   <| constructor << MouseUp,
-      Mouse.downs <| constructor << MouseDown,
-      Mouse.moves <| constructor << MouseMove
-    ]
+  let ups   = Mouse.ups <| constructor << MouseUp
+      downs = Mouse.downs <| constructor << MouseDown
+      moves = Mouse.moves <| constructor << MouseMove
+      subs = if model.isDown then [ ups, downs, moves ] else [ downs ]
+  in Sub.batch subs
 
 dragCmd : ((Int, Int) -> msg) -> (Int, Int) -> (Int, Int) -> Cmd msg
 dragCmd constructor (px, py) (cx, cy) =
