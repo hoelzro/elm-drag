@@ -1,55 +1,34 @@
 import Html.App as App
 import Html exposing (Html, text)
 
-import Mouse
-import Task
-import Time
+import Drag
 
 type alias Model = {
-    isDown : Bool,
-    wasDown : Bool,
-    currPosition : (Int, Int),
-    prevPosition : (Int, Int),
+    dragModel : Drag.Model,
     dragDistance : Int
   }
 
 type Msg =
-  MouseUp   Mouse.Position |
-  MouseDown Mouse.Position |
-  MouseMove Mouse.Position |
+  DragMsg Drag.Msg |
   Drag (Int, Int)
-
-dragCmd : ((Int, Int) -> msg) -> (Int, Int) -> (Int, Int) -> Cmd msg
-dragCmd constructor (px, py) (cx, cy) =
-  let dx = px - cx
-      dy = py - cy
-      task = always <| constructor (dx, dy)
-  in Task.perform task task Time.now
 
 init : (Model, Cmd Msg)
 init =
   let initialModel = {
-    isDown = False,
-    wasDown = False,
-    currPosition = (0, 0),
-    prevPosition = (0, 0),
+    dragModel = Drag.initialModel,
     dragDistance = 0
   } in (initialModel, Cmd.none)
+
+subscriptions : Model -> Sub Msg
+subscriptions model = Drag.subscriptions model.dragModel DragMsg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    MouseUp _        -> ({ model | isDown = False, wasDown = model.isDown }, Cmd.none)
-    MouseDown {x, y} -> ({ model | isDown = True, wasDown = model.isDown, currPosition = (x, y), prevPosition = (x, y) }, Cmd.none)
-    MouseMove {x, y} -> ({ model | currPosition = (x, y), prevPosition = model.currPosition }, if model.isDown then dragCmd Drag model.currPosition (x, y) else Cmd.none)
-    Drag (dx, dy)    -> ({ model | dragDistance = model.dragDistance + (abs dx) + (abs dy) }, Cmd.none)
-
-subscriptions : Model -> Sub Msg
-subscriptions _ = Sub.batch [
-    Mouse.ups   MouseUp,
-    Mouse.downs MouseDown,
-    Mouse.moves MouseMove
-  ]
+    DragMsg msg ->
+      let (newDragModel, dragCmd) = Drag.update msg model.dragModel Drag
+      in ({model | dragModel = newDragModel}, dragCmd)
+    Drag (dx, dy) -> ({ model | dragDistance = model.dragDistance + (abs dx) + (abs dy) }, Cmd.none)
 
 view : Model -> Html Msg
 view model = text <| toString model
