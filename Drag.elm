@@ -62,8 +62,8 @@ subscriptions constructor model =
 
 dragCmd : ((Int, Int) -> msg) -> (Int, Int) -> (Int, Int) -> Cmd msg
 dragCmd constructor (px, py) (cx, cy) =
-  let dx = px - cx
-      dy = py - cy
+  let dx = cx - px
+      dy = cy - py
       task = always <| constructor (dx, dy)
   in Task.perform task task Time.now
 
