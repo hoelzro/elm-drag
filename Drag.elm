@@ -1,26 +1,39 @@
 module Drag exposing (Model, Msg(..), initialModel, subscriptions, update)
 
+{-| Module documentation.
+
+@docs Model, Msg, initialModel, subscriptions, update
+-}
+
 import Task
 import Time
 
 import Mouse
 
+{-| Model documentation.
+-}
 type alias Model = {
     isDown : Bool,
     currPosition : (Int, Int)
   }
 
+{-| Msg documentation.
+-}
 type Msg =
   MouseUp   Mouse.Position |
   MouseDown Mouse.Position |
   MouseMove Mouse.Position
 
+{-| initialModel documentation.
+-}
 initialModel : Model
 initialModel = {
     isDown = False,
     currPosition = (0, 0)
   }
 
+{-| subscriptions documentation.
+-}
 subscriptions : (Msg -> msg) -> Model -> Sub msg
 subscriptions constructor model =
   let ups   = Mouse.ups <| constructor << MouseUp
@@ -36,6 +49,8 @@ dragCmd constructor (px, py) (cx, cy) =
       task = always <| constructor (dx, dy)
   in Task.perform task task Time.now
 
+{-| update documentation.
+-}
 update : ((Int, Int) -> msg) -> Msg -> Model -> (Model, Cmd msg)
 update constructor msg model =
   case msg of
