@@ -1,4 +1,4 @@
-module Drag exposing (Model, Msg(..), initialModel, subscriptions, update)
+module Drag exposing (Model, Msg, initialModel, subscriptions, update)
 
 {-| Module documentation.
 
