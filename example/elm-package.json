@@ -1,0 +1,17 @@
+{
+    "version": "1.0.0",
+    "summary": "Track dragging motions when the mouse is down",
+    "repository": "https://github.com/hoelzro/elm-drag.git",
+    "license": "BSD3",
+    "source-directories": [
+        ".",
+        ".."
+    ],
+    "exposed-modules": [],
+    "dependencies": {
+        "elm-lang/core": "4.0.1 <= v < 5.0.0",
+        "elm-lang/html": "1.0.0 <= v < 2.0.0",
+        "elm-lang/mouse": "1.0.0 <= v < 2.0.0"
+    },
+    "elm-version": "0.17.0 <= v < 0.18.0"
+}
