@@ -106,7 +106,7 @@ dragCmd constructor (px, py) (cx, cy) =
   let dx = cx - px
       dy = cy - py
       task = always <| constructor (dx, dy)
-  in Task.perform task task Time.now
+  in Task.perform task Time.now
 
 {-| Updates the drag model.  The first argument is a function that
 converts an `(Int, Int)` to your application's message type; if you
