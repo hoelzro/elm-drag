@@ -41,7 +41,7 @@ init =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Drag.subscriptions DragMsg model.dragModel
+    Sub.map DragMsg <| Drag.subscriptions model.dragModel
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
