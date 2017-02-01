@@ -32,7 +32,7 @@ pressed down.
       } in (initialModel, Cmd.none)
 
     subscriptions : Model -> Sub Msg
-    subscriptions model = Drag.subscriptions DragMsg model.dragModel
+    subscriptions model = Sub.map DragMsg <| Drag.subscriptions model.dragModel
 
     update : Msg -> Model -> (Model, Cmd Msg)
     update msg model =
@@ -87,17 +87,13 @@ initialModel = {
     currPosition = (0, 0)
   }
 
-{-| Returns a subscription for the events that elm-drag needs to function.
-The first argument is a constructor that converts elm-drag messages into
-your application's messages; usually you'll have a `type Msg = DragMsg Drag.Msg`
-constructor, so this argument would just be `DragMsg`.  The second argument
-is the drag model.
+{-| Returns a subscription for the events that elm-drag needs to function. Usually you'd use `Sub.map` to wrap this subscription into your main subscription. 
 -}
-subscriptions : (Msg -> msg) -> Model -> Sub msg
-subscriptions constructor model =
-  let ups   = Mouse.ups <| constructor << MouseUp
-      downs = Mouse.downs <| constructor << MouseDown
-      moves = Mouse.moves <| constructor << MouseMove
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  let ups   = Mouse.ups MouseUp
+      downs = Mouse.downs MouseDown
+      moves = Mouse.moves MouseMove
       subs = if model.isDown then [ ups, downs, moves ] else [ downs ]
   in Sub.batch subs
 
